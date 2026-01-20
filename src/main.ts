@@ -1,126 +1,138 @@
 import './style.css';
-// GSAP and LocomotiveScroll are loaded via CDN in index.html, so we treat them as globals or use window
-// Ideally we should install them via npm, but for modernization of legacy code without breaking logic, we keep CDN or install types.
-// For now, we import the css.
+import LocomotiveScroll from 'locomotive-scroll';
+import 'locomotive-scroll/dist/locomotive-scroll.css';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
 function init() {
-    gsap.registerPlugin(ScrollTrigger);
+    const mainEl = document.querySelector(".main") as HTMLElement;
+    if (!mainEl) return;
 
     const locoScroll = new LocomotiveScroll({
-        el: document.querySelector(".main"),
-        smooth: true
+        el: mainEl,
+        smooth: true,
+        tablet: { smooth: true },
+        smartphone: { smooth: true }
     });
+
     locoScroll.on("scroll", ScrollTrigger.update);
 
     ScrollTrigger.scrollerProxy(".main", {
         scrollTop(value) {
             return arguments.length ? locoScroll.scrollTo(value, 0, 0) : locoScroll.scroll.instance.scroll.y;
-        }, // we don't have to define a scrollLeft because we're only scrolling vertically.
+        },
         getBoundingClientRect() {
             return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
         },
-        pinType: document.querySelector(".main").style.transform ? "transform" : "fixed"
+        pinType: mainEl.style.transform ? "transform" : "fixed"
     });
 
-
     ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
-
     ScrollTrigger.refresh();
-
 }
 
-init()
+init();
 
-var crsr = document.querySelector(".cursor")
-var main = document.querySelector(".main")
-document.addEventListener("mousemove",function(dets){
-    crsr.style.left = dets.x + 20+"px"
-    crsr.style.top = dets.y + 20+"px"
-})
+// Cursor Logic
+const crsr = document.querySelector(".cursor") as HTMLElement;
+const main = document.querySelector(".main") as HTMLElement;
 
-gsap.from(".page1 h1,.page1 h2", {
+if (crsr && main) {
+    document.addEventListener("mousemove", (dets) => {
+        gsap.to(crsr, {
+            x: dets.x + 20,
+            y: dets.y + 20,
+            duration: 0.3,
+            ease: "power2.out"
+        });
+    });
+}
+
+// Page 1 Animations
+gsap.from(".page1 h1, .page1 h2", {
     y: 10,
     rotate: 10,
     opacity: 0,
     delay: 0.3,
     duration: 0.7
-})
-var tl = gsap.timeline({
+});
+
+const tl = gsap.timeline({
     scrollTrigger: {
         trigger: ".page1 h1",
         scroller: ".main",
-        // markers:true,
         start: "top 27%",
         end: "top 0",
         scrub: 3
     }
-})
-tl.to(".page1 h1", {
-    x: -100,
-}, "anim")
-tl.to(".page1 h2", {
-    x: 100
-}, "anim")
-tl.to(".page1 video", {
-    width: "90%"
-}, "anim")
+});
 
-var tl2 = gsap.timeline({
+tl.to(".page1 h1", { x: -100 }, "anim")
+    .to(".page1 h2", { x: 100 }, "anim")
+    .to(".page1 video", { width: "90%" }, "anim");
+
+const tl2 = gsap.timeline({
     scrollTrigger: {
         trigger: ".page1 h1",
         scroller: ".main",
-        // markers:true,
         start: "top -115%",
         end: "top -120%",
         scrub: 3
     }
-})
-tl2.to(".main", {
-    backgroundColor: "#fff",
-})
+});
 
-var tl3 = gsap.timeline({
+tl2.to(".main", { backgroundColor: "#fff" });
+
+const tl3 = gsap.timeline({
     scrollTrigger: {
         trigger: ".page1 h1",
         scroller: ".main",
-        // markers:true,
         start: "top -280%",
         end: "top -300%",
         scrub: 3
     }
-})
+});
 
-tl3.to(".main",{
-    backgroundColor:"#0F0D0D"
-})
+tl3.to(".main", { backgroundColor: "#0F0D0D" });
 
+// Box Images on Cursor
+const boxes = document.querySelectorAll(".box");
+boxes.forEach((elem) => {
+    elem.addEventListener("mouseenter", () => {
+        const att = elem.getAttribute("data-image");
+        if (att && crsr) {
+            crsr.style.width = "470px";
+            crsr.style.height = "370px";
+            crsr.style.borderRadius = "0";
+            crsr.style.backgroundImage = `url(${att})`;
+            crsr.style.mixBlendMode = "normal";
+        }
+    });
+    elem.addEventListener("mouseleave", () => {
+        if (crsr) {
+            crsr.style.width = "20px";
+            crsr.style.height = "20px";
+            crsr.style.borderRadius = "50%";
+            crsr.style.backgroundImage = `none`;
+            crsr.style.mixBlendMode = "difference";
+        }
+    });
+});
 
-var boxes = document.querySelectorAll(".box")
-boxes.forEach(function(elem){
-    elem.addEventListener("mouseenter",function(){
-        var att = elem.getAttribute("data-image")
-        crsr.style.width = "470px"
-        crsr.style.height = "370px"
-        crsr.style.borderRadius = "0"
-        crsr.style.backgroundImage = `url(${att})`
-    })
-    elem.addEventListener("mouseleave",function(){
-        elem.style.backgroundColor = "transparent"
-        crsr.style.width = "20px"
-        crsr.style.height = "20px"
-        crsr.style.borderRadius = "50%"
-        crsr.style.backgroundImage = `none`
-    })
-})
-
-var h4 = document.querySelectorAll("#nav h4")
-var purple = document.querySelector("#purple")
-h4.forEach(function(elem){
-    elem.addEventListener("mouseenter",function(){
-        purple.style.display = "block"   
-        purple.style.opacity = "1"
-    })
-    elem.addEventListener("mouseleave",function(){
-        purple.style.display = "none"   
-        purple.style.opacity = "0"
-    })
-})
+// Nav Hover Effect
+const navLinks = document.querySelectorAll("#nav h4");
+const purple = document.querySelector("#purple") as HTMLElement;
+if (purple) {
+    navLinks.forEach((elem) => {
+        elem.addEventListener("mouseenter", () => {
+            purple.style.display = "block";
+            purple.style.opacity = "1";
+        });
+        elem.addEventListener("mouseleave", () => {
+            purple.style.display = "none";
+            purple.style.opacity = "0";
+        });
+    });
+}
