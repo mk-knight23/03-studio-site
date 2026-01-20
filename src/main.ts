@@ -1,3 +1,7 @@
+import './style.css';
+// GSAP and LocomotiveScroll are loaded via CDN in index.html, so we treat them as globals or use window
+// Ideally we should install them via npm, but for modernization of legacy code without breaking logic, we keep CDN or install types.
+// For now, we import the css.
 function init() {
     gsap.registerPlugin(ScrollTrigger);
 
