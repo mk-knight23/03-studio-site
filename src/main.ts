@@ -1,50 +1,18 @@
 import './style.css';
-import LocomotiveScroll from 'locomotive-scroll';
-import 'locomotive-scroll/dist/locomotive-scroll.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-function init() {
-    const mainEl = document.querySelector(".main") as HTMLElement;
-    if (!mainEl) return;
-
-    const locoScroll = new LocomotiveScroll({
-        el: mainEl,
-        smooth: true,
-        tablet: { smooth: true },
-        smartphone: { smooth: true }
-    });
-
-    locoScroll.on("scroll", ScrollTrigger.update);
-
-    ScrollTrigger.scrollerProxy(".main", {
-        scrollTop(value) {
-            return arguments.length ? locoScroll.scrollTo(value, 0, 0) : locoScroll.scroll.instance.scroll.y;
-        },
-        getBoundingClientRect() {
-            return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
-        },
-        pinType: mainEl.style.transform ? "transform" : "fixed"
-    });
-
-    ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
-    ScrollTrigger.refresh();
-}
-
-init();
-
 // Cursor Logic
 const crsr = document.querySelector(".cursor") as HTMLElement;
-const main = document.querySelector(".main") as HTMLElement;
 
-if (crsr && main) {
+if (crsr) {
     document.addEventListener("mousemove", (dets) => {
         gsap.to(crsr, {
-            x: dets.x + 20,
-            y: dets.y + 20,
-            duration: 0.3,
+            x: dets.x,
+            y: dets.y,
+            duration: 0.2,
             ease: "power2.out"
         });
     });
@@ -52,87 +20,137 @@ if (crsr && main) {
 
 // Page 1 Animations
 gsap.from(".page1 h1, .page1 h2", {
-    y: 10,
-    rotate: 10,
+    y: 50,
     opacity: 0,
-    delay: 0.3,
-    duration: 0.7
+    stagger: 0.2,
+    delay: 0.5,
+    duration: 1,
+    ease: "power3.out"
 });
 
-const tl = gsap.timeline({
+gsap.from(".hero-content p", {
+    y: 30,
+    opacity: 0,
+    delay: 1,
+    duration: 0.8
+});
+
+// Page 2 Animations
+gsap.from(".page2 h1", {
     scrollTrigger: {
-        trigger: ".page1 h1",
+        trigger: ".page2",
         scroller: ".main",
-        start: "top 27%",
-        end: "top 0",
-        scrub: 3
-    }
+        start: "top 80%",
+    },
+    y: 50,
+    opacity: 0,
+    duration: 0.8
 });
 
-tl.to(".page1 h1", { x: -100 }, "anim")
-    .to(".page1 h2", { x: 100 }, "anim")
-    .to(".page1 video", { width: "90%" }, "anim");
-
-const tl2 = gsap.timeline({
+gsap.from(".page2-left h2", {
     scrollTrigger: {
-        trigger: ".page1 h1",
+        trigger: ".page2",
         scroller: ".main",
-        start: "top -115%",
-        end: "top -120%",
-        scrub: 3
-    }
+        start: "top 70%",
+    },
+    x: -50,
+    opacity: 0,
+    duration: 0.8,
+    delay: 0.2
 });
 
-tl2.to(".main", { backgroundColor: "#fff" });
-
-const tl3 = gsap.timeline({
+gsap.from(".page2-right p", {
     scrollTrigger: {
-        trigger: ".page1 h1",
+        trigger: ".page2",
         scroller: ".main",
-        start: "top -280%",
-        end: "top -300%",
-        scrub: 3
-    }
+        start: "top 60%",
+    },
+    y: 30,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.1,
+    delay: 0.3
 });
 
-tl3.to(".main", { backgroundColor: "#0F0D0D" });
-
-// Box Images on Cursor
-const boxes = document.querySelectorAll(".box");
-boxes.forEach((elem) => {
-    elem.addEventListener("mouseenter", () => {
-        const att = elem.getAttribute("data-image");
-        if (att && crsr) {
-            crsr.style.width = "470px";
-            crsr.style.height = "370px";
-            crsr.style.borderRadius = "0";
-            crsr.style.backgroundImage = `url(${att})`;
-            crsr.style.mixBlendMode = "normal";
-        }
-    });
-    elem.addEventListener("mouseleave", () => {
-        if (crsr) {
-            crsr.style.width = "20px";
-            crsr.style.height = "20px";
-            crsr.style.borderRadius = "50%";
-            crsr.style.backgroundImage = `none`;
-            crsr.style.mixBlendMode = "difference";
-        }
-    });
+// Product Cards Animation
+gsap.from(".product-card", {
+    scrollTrigger: {
+        trigger: ".products-grid",
+        scroller: ".main",
+        start: "top 80%",
+    },
+    y: 50,
+    opacity: 0,
+    stagger: 0.1,
+    duration: 0.6
 });
 
-// Nav Hover Effect
-const navLinks = document.querySelectorAll("#nav h4");
-const purple = document.querySelector("#purple") as HTMLElement;
-if (purple) {
-    navLinks.forEach((elem) => {
-        elem.addEventListener("mouseenter", () => {
-            purple.style.display = "block";
-            purple.style.opacity = "1";
+// Work Cards Animation
+gsap.from(".work-card", {
+    scrollTrigger: {
+        trigger: ".work-grid",
+        scroller: ".main",
+        start: "top 80%",
+    },
+    y: 50,
+    opacity: 0,
+    stagger: 0.1,
+    duration: 0.6
+});
+
+// Skill Categories Animation
+gsap.from(".skill-category", {
+    scrollTrigger: {
+        trigger: ".skills-grid",
+        scroller: ".main",
+        start: "top 80%",
+    },
+    y: 30,
+    opacity: 0,
+    stagger: 0.1,
+    duration: 0.6
+});
+
+// Footer Animation
+gsap.from(".footer-content", {
+    scrollTrigger: {
+        trigger: "footer",
+        scroller: ".main",
+        start: "top 80%",
+    },
+    y: 50,
+    opacity: 0,
+    duration: 0.8
+});
+
+// Hover effects on cards
+document.querySelectorAll('.product-card, .work-card, .skill-category').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        gsap.to(crsr, {
+            scale: 1.5,
+            duration: 0.3
         });
-        elem.addEventListener("mouseleave", () => {
-            purple.style.display = "none";
-            purple.style.opacity = "0";
+    });
+    card.addEventListener('mouseleave', () => {
+        gsap.to(crsr, {
+            scale: 1,
+            duration: 0.3
         });
     });
-}
+});
+
+// Nav link hover
+document.querySelectorAll('#nav-part2 a').forEach(link => {
+    link.addEventListener('mouseenter', () => {
+        gsap.to(crsr, {
+            scale: 2,
+            duration: 0.3
+        });
+    });
+    link.addEventListener('mouseleave', () => {
+        gsap.to(crsr, {
+            scale: 1,
+            duration: 0.3
+        });
+    });
+});
